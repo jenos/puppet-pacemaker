@@ -5,7 +5,7 @@
       <cluster_property_set id="cib-bootstrap-options">
 <%
 if @crm_config
-  @crm_config.each do |key, value|
+  @crm_config.sort.each do |key, value|
 -%>
         <nvpair id="cib-bootstrap-options-<%= key %>" name="<%= key %>" value="<%= @crm_config[key] %>"/>
 <%
@@ -58,7 +58,7 @@ if @resources
 -%>
           <instance_attributes id="<%= res %>-instance_attributes">
 <%
-      conf['params'].each do |p,val|
+      conf['params'].sort.each do |p,val|
 -%>
             <nvpair id="<%= res %>-instance_attributes-<%= p %>" name="<%= p %>" value="<%= val %>"/>
 <%

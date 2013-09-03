@@ -26,6 +26,13 @@ Default: `running`.
 * `onboot` - whether to enable or disable the service on boot. Valid values:
 `true`, `false` or `manual`. Default: `true`.
 
+* `manage_cib` - if this is set to `true`, then the node which it is set on
+will manage CIB configuration. Default: `false`.
+
+* `service_delay` - Number of seconds for the corosync service to be delayed to start.
+This is useful when you have LACP bonded network interfaces, because they usually take
+around a minute to come up and start sending traffic. Default: `0`.
+
 * `bindnetaddr` - This specifies the network address the corosync executive
 should bind to. `bindnetaddr` should be an IP address configured on the system,
 or a network address. For  example,  if  the  local  interface  is  192.168.5.92
