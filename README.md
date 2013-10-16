@@ -9,9 +9,6 @@ This module abstracts the `crm`, `cibadmin` and `cib_verify` cli tools. It gener
 cib xml file from specified hashes, does cib verification and if that passes, then it
 applies the configuration to the cluster.
 
-You have to dedicate a single node which will apply CIB configuration to the cluster.
-See `manage_cib` parameter below.
-
 This module is most flexible and most easier to manage when used with hiera.
 
 ## Classes
