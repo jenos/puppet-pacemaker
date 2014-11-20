@@ -7,76 +7,36 @@
 # - Vaidas Jablonskis <jablonskis@gmail.com>
 #
 class pacemaker(
-  $service       = 'running',
-  $onboot        = true,
-  $package       = 'installed',
-  $manage_cib    = false,
-  $service_delay = 0,
-  $bindnetaddr   = undef,
-  $mcastaddr     = undef,
-  $mcastport     = 5410,
-  $debug_logging = 'off',
-  $crm_config    = undef,
-  $nodes         = undef,
-  $resources     = undef,
-  $constraints   = undef,
-) {
-  case $::osfamily {
-    Debian: {
-      # do nothing - supported distro
-    }
-    default: {
-      fail("Module ${module_name} is not supported on ${::operatingsystem}")
-    }
-  }
+  $bindnetaddr,
+  $mcastaddr,
+  $nodes,
+  $mcastport             = 5410,
+  $crm_config            = undef,
+  $resources             = undef,
+  $constraints           = undef,
+  $packages              = $::pacemaker::params::packages,
+  $package_require       = $::pacemaker::params::package_require,
+  $service_name          = $::pacemaker::params::service_name,
+  $pcmk_service_file     = $::pacemaker::params::pcmk_service_file,
+  $pcmk_service_template = $::pacemaker::params::pcmk_service_template,
+  $config_file           = $::pacemaker::params::config_file,
+  $conf_template         = $::pacemaker::params::conf_template,
+  $cib_xml_file          = $::pacemaker::params::cib_xml_file,
+  $cib_xml_template      = $::pacemaker::params::cib_xml_template,
+  $service               = $::pacemaker::params::service,
+  $enabled               = $::pacemaker::params::enabled,
+  $manage_cib            = $::pacemaker::params::manage_cib,
+  $debug_logging         = $::pacemaker::params::debug_logging
+) inherits ::pacemaker::params {
 
-  $package_name           = 'corosync'
-  $pacemaker_package_name = 'pacemaker'
-  $service_name           = 'corosync'
-
-  $pcmk_service_file      = '/etc/corosync/service.d/pacemaker'
-  $pcmk_service_template  = 'pacemaker.erb'
-
-  $config_file            = '/etc/corosync/corosync.conf'
-  $conf_template          = 'corosync.conf.erb'
-
-  $cib_xml_file           = '/etc/corosync/cib_config.xml'
-  $cib_xml_template       = 'cib_config.xml.erb'
-
-  $default_file           = '/etc/default/corosync'
-  $default_file_template  = 'corosync.default.erb'
-  $init_script            = '/etc/init.d/corosync'
-
-  if $bindnetaddr == undef {
-    fail('Please specify bindnetaddr.')
-  }
-
-  if $mcastaddr == undef {
-    fail('Please specify mcastaddr.')
-  }
-
-  if $nodes == undef {
-    fail('Please specify at least one node of your cluster.')
-  }
-
-  package { $package_name:
-    ensure  => $package,
-  }
-
-  package { $pacemaker_package_name:
-    ensure  => installed,
-  }
+  package { $packages: }
 
   service { $service_name:
-    ensure     => $service,
-    enable     => $onboot,
+    ensure     => $::pacemaker::params::service,
+    enable     => $enabled,
     hasrestart => true,
     hasstatus  => true,
-    require    => [
-                    File[$config_file],
-                    File[$default_file],
-                    Package[$package_name]
-                  ],
+    require    => [ File[$config_file], Package[$package_require] ],
   }
 
   file { $config_file:
@@ -86,7 +46,7 @@ class pacemaker(
     mode    => '0644',
     content => template("${module_name}/${conf_template}"),
     notify  => Service[$service_name],
-    require => Package[$package_name],
+    require => Package[$package_require],
   }
 
   file { $pcmk_service_file:
@@ -96,27 +56,7 @@ class pacemaker(
     mode    => '0644',
     content => template("${module_name}/${pcmk_service_template}"),
     notify  => Service[$service_name],
-    require => Package[$package_name],
-  }
-
-  if $::osfamily == 'Debian' {
-    file { $default_file:
-      ensure  => file,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      content => template("${module_name}/${default_file_template}"),
-      require => Package[$package_name],
-    }
-
-    file { $init_script:
-      ensure => file,
-      owner  => 'root',
-      group  => 'root',
-      mode   => '0755',
-      source => "puppet:///modules/${module_name}/corosync.init",
-      before => Service[$service_name],
-    }
+    require => Package[$package_require],
   }
 
   if $manage_cib {

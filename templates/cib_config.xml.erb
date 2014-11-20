@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<cib admin_epoch="0" epoch="0" num_updates="0" validate-with="pacemaker-1.2">
+<cib admin_epoch="0" epoch="0" num_updates="0" validate-with="pacemaker-2.0">
   <configuration>
     <crm_config>
       <cluster_property_set id="cib-bootstrap-options">
@@ -102,13 +102,50 @@ if @constraints
   @constraints.each do |con,conf|
     if conf['type'] == 'order'
       score = conf['score'] || 'INFINITY'
-      first_id = conf['first'].split(':')[0]
-      first_action = conf['first'].split(':')[1]
-      then_id = conf['then'].split(':')[0]
-      then_action = conf['then'].split(':')[1]
+
+      if conf.has?('resource_sets')
+	rsc_id = conf['id']
+-%>
+      <rsc_order id="<%= rsc_id %>" score="<%= score %>" >
+
+<%
+	conf.each do |i, set|
+	  set_id = set['id']
+
+	  if set.has?('action')
+	    set_action = set['action']
+-%>
+        <resource_set action="<%= set_action %>" id="<%= set_id %>" >
+<%
+	  else
+-%>
+	<resource_set id="<%= set_id %>" >
+<%
+	  end
+
+	  set.each do |ref_id|
+-%>
+	  <resource_ref id="<%= ref_id %>" />
+<%
+	  end
+-%>
+	</resource_set>
+<%
+	end
+-%>
+      </rsc_order>
+<%
+      else
+        first_id = conf['first'].split(':')[0]
+        first_action = conf['first'].split(':')[1]
+        then_id = conf['then'].split(':')[0]
+        then_action = conf['then'].split(':')[1]
 -%>
       <rsc_order first="<%= first_id %>" first-action="<%= first_action %>" id="<%= con %>" score="<%= score %>" then="<%= then_id %>" then-action="<%= then_action %>"/>
 <%
+      end
+    else if conf['type'] == 'colocation'
+
     end
   end
 end
