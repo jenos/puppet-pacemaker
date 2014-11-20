@@ -99,33 +99,33 @@ end
     <constraints>
 <%
 if @constraints
-  @constraints.each do |con,conf|
+  @constraints.each do |con_name,conf|
     if conf['type'] == 'order'
       score = conf['score'] || 'INFINITY'
 
       if conf.has?('resource_sets')
 	rsc_id = conf['id']
 -%>
-      <rsc_order id="<%= rsc_id %>" score="<%= score %>" >
+      <rsc_order id="<%= rsc_id %>" score="<%= score %>">
 
 <%
-	conf.each do |i, set|
+	conf['resource_sets'].each do |i, set|
 	  set_id = set['id']
 
 	  if set.has?('action')
 	    set_action = set['action']
 -%>
-        <resource_set action="<%= set_action %>" id="<%= set_id %>" >
+        <resource_set action="<%= set_action %>" id="<%= set_id %>">
 <%
 	  else
 -%>
-	<resource_set id="<%= set_id %>" >
+	<resource_set id="<%= set_id %>">
 <%
 	  end
 
-	  set.each do |ref_id|
+	  set['resource_refs'].each do |ref_id|
 -%>
-	  <resource_ref id="<%= ref_id %>" />
+	  <resource_ref id="<%= ref_id %>"/>
 <%
 	  end
 -%>
@@ -145,8 +145,23 @@ if @constraints
 <%
       end
     else if conf['type'] == 'colocation'
-
+      score = conf['score'] || 'INFINITY'
+-%>
+      <rsc_colocation id="<%= con_name %>" score="<%= score %>">
+	<resource_set id="<%= con_name %>-0">
+<%
+      conf['ids'].each do |ref_id|
+-%>
+	  <resource_ref id="<%= ref_id %>"/>
+<%
+      end
+-%>
+	<resource_set/>
+<%
     end
+-%>
+      <rsc_colocation/>
+<%
   end
 end
 -%>
