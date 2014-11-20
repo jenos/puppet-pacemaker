@@ -36,7 +36,7 @@ class pacemaker(
     enable     => $enabled,
     hasrestart => true,
     hasstatus  => true,
-    require    => [ File[$config_file], Package[$package_require] ],
+    require    => [ File[$config_file], File[$pcmk_service_file], Package['openais'] ],
   }
 
   file { $config_file:
@@ -46,7 +46,7 @@ class pacemaker(
     mode    => '0644',
     content => template("${module_name}/${conf_template}"),
     notify  => Service[$service_name],
-    require => Package[$package_require],
+    require => Package['corosync'],
   }
 
   file { $pcmk_service_file:
@@ -56,7 +56,7 @@ class pacemaker(
     mode    => '0644',
     content => template("${module_name}/${pcmk_service_template}"),
     notify  => Service[$service_name],
-    require => Package[$package_require],
+    require => Package['pacemaker'],
   }
 
   if $manage_cib {

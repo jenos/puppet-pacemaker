@@ -1,7 +1,7 @@
 
 class pacemaker::params {
-  $packages               = ['corosync', 'pacemaker']
-  $package_require        = [ 'corosync', 'pacemaker', 'crmsh' ]
+  $packages               = ['corosync', 'pacemaker', 'openais']
+  $package_require        = ['corosync', 'pacemaker', 'openais']
   $service_name           = 'corosync'
 
   $pcmk_service_file      = '/etc/corosync/service.d/pacemaker'
