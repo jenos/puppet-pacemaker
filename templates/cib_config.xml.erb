@@ -29,13 +29,12 @@ end
 <%
 if @resources
   @resources.each do |res,conf|
-    agent_class = conf['agent'].split(':')[0]
-    agent_provider = conf['agent'].split(':')[1]
-    agent_type = conf['agent'].split(':')[2]
+    agent_class = conf['class']
+    agent_type = conf['type']
 
     if conf['clone']
 -%>
-      <clone id="<%= res %>_clone">
+      <master id="<%= res %>_clone">
 <%
       if conf['clone_params']
 -%>
@@ -51,9 +50,18 @@ if @resources
 <%
       end
     end
+
+    if conf['provider']
+      agent_provider = conf['provider']
 -%>
         <primitive class="<%= agent_class %>" id="<%= res %>" provider="<%= agent_provider %>" type="<%= agent_type %>">
 <%
+    else
+-%>
+	<primitive class="<%= agent_class %>" id="<%= res %>" type="<%= agent_type %>">
+<%
+    end
+
     if conf['params']
 -%>
           <instance_attributes id="<%= res %>-instance_attributes">
@@ -74,11 +82,10 @@ if @resources
           <operations>
 <%
       conf['operations'].each do |op,params|
-        params.each do |p,val|
+	list = params.map{|k,v| "#{k}=\"#{v}\""}.join(' ')
 -%>
-            <op id="<%= res %>-<%= op %>-<%= val %>" <%= p %>="<%= val %>" name="<%= op %>"/>
+            <op id="<%= res %>-<%= op %>-0" <%= list %> name="<%= op %>"/>
 <%
-        end
       end
 -%>
           </operations>
@@ -89,7 +96,7 @@ if @resources
 <%
     if conf['clone']
 -%>
-      </clone>
+      </master>
 <%
     end
   end
