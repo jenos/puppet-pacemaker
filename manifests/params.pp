@@ -15,7 +15,7 @@ class pacemaker::params {
 
   $service                = 'running'
   $enabled                = 'true'
-  $manage_cib             = 'false'
+  $manage_cib             = false
   $debug_logging          = 'off'
 
 }
