@@ -59,7 +59,7 @@ class pacemaker(
     require => Package['pacemaker'],
   }
 
-  if $manage_cib {
+  if str2bool("$manage_cib") {
     file { $cib_xml_file:
       ensure  => file,
       owner   => 'root',
