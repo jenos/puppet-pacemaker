@@ -5,7 +5,7 @@
       <cluster_property_set id="cib-bootstrap-options">
 <%
 if @crm_config
-  @crm_config.sort.each do |key, value|
+  @crm_config.sort_by { |k, v| k.to_s }.each do |key, value|
 -%>
         <nvpair id="cib-bootstrap-options-<%= key %>" name="<%= key %>" value="<%= @crm_config[key] %>"/>
 <%
@@ -17,7 +17,7 @@ end
     <nodes>
 <%
 if @nodes
-  @nodes.each do |node|
+  @nodes.sort_by { |k, v| k.to_s }.each do |node|
 -%>
       <node id="<%= node %>" type="normal" uname="<%= node %>"/>
 <%
@@ -28,7 +28,7 @@ end
     <resources>
 <%
 if @resources
-  @resources.each do |res,conf|
+  @resources.sort_by { |k, v| k.to_s }.each do |res,conf|
     agent_class = conf['class']
     agent_type = conf['type']
 
@@ -40,7 +40,7 @@ if @resources
 -%>
         <meta_attributes id="<%= res %>_clone-meta_attributes">
 <%
-        conf['clone_params'].each do |p, val|
+        conf['clone_params'].sort_by { |k, v| k.to_s }.each do |p, val|
 -%>
           <nvpair id="<%= res %>_clone-meta_attributes-<%= p %>" name="<%= p %>" value="<%= val %>"/>
 <%
@@ -66,7 +66,7 @@ if @resources
 -%>
           <instance_attributes id="<%= res %>-instance_attributes">
 <%
-      conf['params'].sort.each do |p,val|
+      conf['params'].sort_by { |k, v| k.to_s }.each do |p,val|
 -%>
             <nvpair id="<%= res %>-instance_attributes-<%= p %>" name="<%= p %>" value="<%= val %>"/>
 <%
@@ -81,7 +81,7 @@ if @resources
 -%>
           <operations>
 <%
-      conf['operations'].each do |op,params|
+      conf['operations'].sort_by { |k, v| k.to_s }.each do |op,params|
 	list = params.map{|k,v| "#{k}=\"#{v}\""}.join(' ')
 -%>
             <op id="<%= res %>-<%= op %>-0" <%= list %> name="<%= op %>"/>
@@ -106,7 +106,7 @@ end
     <constraints>
 <%
 if @constraints
-  @constraints.each do |con_name,conf|
+  @constraints.sort_by { |k, v| k.to_s }.each do |con_name,conf|
     if conf['type'] == 'order'
       score = conf['score'] || 'INFINITY'
 
@@ -115,7 +115,7 @@ if @constraints
 -%>
       <rsc_order id="<%= rsc_id %>" score="<%= score %>">
 <%
-	conf['resource_sets'].each do |set|
+	conf['resource_sets'].sort_by { |k, v| k.to_s }.each do |set|
 	  set_id = set['id']
 
 	  if set.has_key?('action')
@@ -129,7 +129,7 @@ if @constraints
 <%
 	  end
 
-	  set['resource_refs'].each do |ref_id|
+	  set['resource_refs'].sort_by { |k, v| k.to_s }.each do |ref_id|
 -%>
 	  <resource_ref id="<%= ref_id %>"/>
 <%
@@ -156,7 +156,7 @@ if @constraints
       <rsc_colocation id="<%= con_name %>" score="<%= score %>">
 	<resource_set id="<%= con_name %>-0">
 <%
-      conf['ids'].each do |ref_id|
+      conf['ids'].sort_by { |k, v| k.to_s }.each do |ref_id|
 -%>
 	  <resource_ref id="<%= ref_id %>"/>
 <%
