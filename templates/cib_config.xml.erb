@@ -115,7 +115,7 @@ if @constraints
 -%>
       <rsc_order id="<%= rsc_id %>" score="<%= score %>">
 <%
-	conf['resource_sets'].sort_by { |k, v| k.to_s }.each do |set|
+	conf['resource_sets'].sort_by { |k, v| v.to_s }.each do |set|
 	  set_id = set['id']
 
 	  if set.has_key?('action')
